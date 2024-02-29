@@ -6,6 +6,8 @@ use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use App\Models\Residents;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Session;
 
 class ResidentImport implements ToCollection, WithHeadingRow
 {
@@ -15,6 +17,26 @@ class ResidentImport implements ToCollection, WithHeadingRow
     public function collection(Collection $rows)
     {
         // Define the mapping of Excel columns to database columns
+        $validatorMapping = [
+            'email' => 'required|email',
+            'block' => 'required|int',
+            'lot' => 'required|int',
+            'street' => 'required|string',
+            'first_name' => 'required|string',
+            'middle_initial' => 'nullable|string|max:2',
+            'last_name' => 'required|string',
+            'religion' => 'nullable|string',
+            'phone_number' => 'required',
+            'household_size' => 'required|integer|min:2',
+            'occupation' => 'nullable|string',
+            'status' => 'required|in:tenant,owned',
+            'acknowledgement_on_community_rules' => 'required|in:yes,no',
+            'disability' => 'nullable|string',
+            'gender' => 'required|in:Male,Female',
+            'payment_status' => 'required|in:paid,unpaid',
+            'violation' => 'required|in:yes,no',
+            'relationship_to_homeowner' => 'nullable|string',
+        ];
         $columnMapping = [
             'email' => 'email',
             'block' => 'block',
@@ -37,13 +59,21 @@ class ResidentImport implements ToCollection, WithHeadingRow
         ];
 
         foreach ($rows as $row) {
+
+            // Validate the row data
+            $validator = Validator::make($row->toArray(), $validatorMapping);
+
+            if ($validator->fails()) {
+                // If validation fails, redirect back with error messages
+                return redirect()->back()->withErrors($validator)->withInput()->with('form', 'resident');
+            }
             
             // Map Excel columns to database columns dynamically
             $mappedRow = [];
             foreach ($columnMapping as $excelColumn => $dbColumn) {
                 $mappedRow[$dbColumn] = $row[$excelColumn] ?? null;
             }
-
+            
             // Check if the resident exists based on email
             $existingResident = Residents::where('email', $mappedRow['email'])->first();
             if ($existingResident) {
@@ -82,6 +112,8 @@ class ResidentImport implements ToCollection, WithHeadingRow
                 }
             }
         }
+        Session::flash('status', 'Imported Successfully');
     }
+    
 }
 

@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChartController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -31,18 +32,14 @@ Route::middleware('auth')->group(function () {
 require __DIR__.'/auth.php';
 
 Route::middleware(['auth:admin', 'verified'])->group(function () {
-    // Your existing admin dashboard route
-    Route::get('/admin/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
-
-    // Route for rendering the chart within the admin dashboard
-    Route::get('/admin/dashboard', [ChartController::class, 'residentPieChart',])
+    Route::get('/admin/dashboard', [ChartController::class, 'showCharts'])
         ->name('admin.dashboard');
 
-    Route::get('/admin/showData/{resident}/editResidentInfo', [App\Livewire\EditResident::class, 'editResidentInfo'])
-        ->name('admin.showData');
+    Route::get('/admin/residentForms/{residentId}/editResident', [App\Livewire\EditResident::class, 'editResidentInfo'])
+        ->name('admin.residentForms.editResident');
 });
+
+//<----------------------------------------------NAVBAR ROUTES---------------------------------------------->
 
 Route::get('/admin/incidentReport', function () {
     return view('admin.incidentReport');
@@ -52,23 +49,17 @@ Route::get('/admin/userManagement', function () {
     return view('admin.userManagement');
 })->middleware(['auth:admin', 'verified'])->name('admin.userManagement');
 
-Route::get('/admin/recordCar', function () {
-    return view('admin.recordCar');
-})->middleware(['auth:admin', 'verified'])->name('admin.recordCar');
-
-Route::get('/admin/recordPet', function () {
-    return view('admin.recordPet');
-})->middleware(['auth:admin', 'verified'])->name('admin.recordPet');
-
-Route::get('/admin/recordTenant', function () {
-    return view('admin.recordTenant');
-})->middleware(['auth:admin', 'verified'])->name('admin.recordTenant');
-
 Route::get('/admin/residentForms/createResident', function () {
     return view('admin.residentForms.createResident');
 })->middleware(['auth:admin', 'verified'])->name('admin.residentForms.createResident');
 
+Route::get('/admin/archivedPets', function () {
+    return view('admin.archivedPets');
+})->middleware(['auth:admin', 'verified'])->name('admin.archivedPets');
 
+Route::get('/admin/archivedVehicles', function () {
+    return view('admin.archivedVehicles');
+})->middleware(['auth:admin', 'verified'])->name('admin.archivedVehicles');
 
 Route::get('/admin/showData', [App\Http\Controllers\ResidentController::class, 'index'])
     ->middleware(['auth:admin', 'verified'])
@@ -144,3 +135,36 @@ Route::get('/admin/{residentId}/residentForms/createTenant', [App\Http\Controlle
 Route::post('/admin/residentForms/storeTenant', [App\Http\Controllers\ResidentController::class, 'storeTenant'])
     ->middleware(['auth:admin', 'verified'])
     ->name('admin.residentForms.storeTenant');
+
+//<----RESIDENT ARCHIVE ROUTES
+
+Route::delete('resident/{residentId}/archive', [App\Http\Controllers\ArchiveController::class, 'archiveResident'])
+    ->middleware(['auth:admin', 'verified'])
+    ->name('archive.resident');
+
+Route::get('/admin/archivedData', [App\Http\Controllers\ArchiveController::class, 'index'])
+    ->middleware(['auth:admin', 'verified'])
+    ->name('admin.archivedData');
+
+Route::get('/admin/{archivedResidentId}/unarchiveData', [App\Http\Controllers\ArchiveController::class, 'unarchiveResident'])
+    ->middleware(['auth:admin', 'verified'])
+    ->name('admin.unarchiveData');
+
+//<----VEHICLE ARCHIVE ROUTES
+
+Route::delete('vehicle/{vehicleId}/archive', [App\Http\Controllers\ArchiveController::class, 'archiveVehicle'])
+    ->middleware(['auth:admin', 'verified'])
+    ->name('archive.vehicle');
+
+Route::get('/vehicle/{archivedVehicleId}/unarchiveData', [App\Http\Controllers\ArchiveController::class, 'unarchiveVehicle'])
+    ->middleware(['auth:admin', 'verified'])
+    ->name('vehicle.unarchiveData');
+
+//<----PET ARCHIVE ROUTES
+Route::delete('pet/{petId}/archive', [App\Http\Controllers\ArchiveController::class, 'archivePet'])
+    ->middleware(['auth:admin', 'verified'])
+    ->name('archive.pet');
+
+Route::get('/pet/{archivedPetId}/unarchiveData', [App\Http\Controllers\ArchiveController::class, 'unarchivePet'])
+    ->middleware(['auth:admin', 'verified'])
+    ->name('pet.unarchiveData');

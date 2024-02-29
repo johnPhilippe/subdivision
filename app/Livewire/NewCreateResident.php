@@ -51,11 +51,8 @@ class NewCreateResident extends Component
             'gender' => 'required',
             'payment_status' => 'required',
             'violation' => 'required',
-
-
-            // Add validation rules for other properties
         ]);
-
+        
         // Create new resident
         Residents::create([
             'block' => $this->block,

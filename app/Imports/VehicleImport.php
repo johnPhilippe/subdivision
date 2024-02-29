@@ -7,6 +7,8 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 use App\Models\Residents;
 use App\Models\Vehicles;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Session;
 
 class VehicleImport implements ToCollection, WithHeadingRow
 {
@@ -15,14 +17,30 @@ class VehicleImport implements ToCollection, WithHeadingRow
      */
     public function collection(Collection $rows)
     {
+        
         foreach ($rows as $row) {
+            // Validate the pet data
+            $validator = Validator::make($row->toArray(), [
+                'type' => 'required|string',
+                'model' => 'required|string',
+                'make' => 'required|string',
+                'plate_number' => 'required|string',
+                'color' => 'required|string',
+                'sticker_number' => 'required|string',
+            ]);
+
+            if ($validator->fails()) {
+                // If validation fails, handle the error
+                return redirect()->back()->withErrors($validator)->withInput()->with('form', 'pet');
+            }
+
             $vehicleData = [
-                'type' => $row['type'] ?? null,
-                'model' => $row['model'] ?? null,
-                'make' => $row['make'] ?? null,
-                'plate_number' => $row['plate_number'] ?? null,
-                'color' => $row['color'] ?? null,
-                'sticker_number' => $row['sticker_number'] ?? null,
+                'type' => $row['type'],
+                'model' => $row['model'],
+                'make' => $row['make'],
+                'plate_number' => $row['plate_number'],
+                'color' => $row['color'],
+                'sticker_number' => $row['sticker_number'],
             ];
 
             // Check if there is an existing resident with the provided email
@@ -35,10 +53,9 @@ class VehicleImport implements ToCollection, WithHeadingRow
                 // Create or update the pet
                 Vehicles::updateOrCreate(['type' => $vehicleData['type']], $vehicleData);
             } else {
-                // Handle the case where the resident with the given email is not found
-                // You may log an error, skip the record, or take appropriate action
-                // Example: Log::error('Resident not found for email: ' . $row['email']);
+                
             }
         }
+        Session::flash('status', 'Imported Successfully');
     }
 }

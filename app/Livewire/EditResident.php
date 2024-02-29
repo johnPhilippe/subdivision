@@ -28,8 +28,10 @@ class EditResident extends Component
     
     public function editResidentInfo($residentId)
     {
-        // Emit an event to load the EditResident component with the selected resident data
-        return view('admin.residentForms.editResident', compact('residentId'));
+        $resident = Residents::find($residentId);
+        $this->residentId = $residentId;
+        // Pass both residentId and resident to the view
+        return view('admin.residentForms.editResident', ['residentId' => $this->residentId, 'resident' => $resident]);
     }
 
     public function mount($residentId)
@@ -108,13 +110,12 @@ class EditResident extends Component
                 'violation' => $this->violation,
             ]);
 
-            // Emit an event to refresh the residents list in the parent component
-            $this->emit('refreshResidentsList');
+            // Flash a success message
+            session()->flash('status', 'Updated Successfully!');
 
-            
+            // Redirect back to the previous page
+            return redirect()->to(url()->previous());
         }
-
-        // Redirect or perform other actions as needed
     }
 
 }

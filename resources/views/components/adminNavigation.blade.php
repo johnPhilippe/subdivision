@@ -24,10 +24,14 @@
                         {{ __('Incident Report') }}
                     </x-nav-link>
 
+                    <x-nav-link :href="route('admin.showData')" :active="request()->routeIs('admin.showData')">
+                        {{ __('Homeowners Records') }}
+                    </x-nav-link>
+
                     <x-dropdown>
                         <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <div>Records</div>
+                            <div>Archives</div>
 
                             <div class="ms-1">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -39,17 +43,14 @@
 
                         <x-slot name="content">
                             <!-- Dropdown content goes here -->
-                            <x-dropdown-link :href="route('admin.showData')">
-                                {{ __('Homeowners Records') }}
+                            <x-dropdown-link :href="route('admin.archivedData')">
+                                {{ __('Archived Residents') }}
                             </x-dropdown-link>
-                            <x-dropdown-link :href="route('admin.recordTenant')">
-                                {{ __('Tenants Records') }}
+                            <x-dropdown-link :href="route('admin.archivedPets')">
+                                {{ __('Archived Pets') }}
                             </x-dropdown-link>
-                            <x-dropdown-link :href="route('admin.recordCar')">
-                                {{ __('Cars Records') }}
-                            </x-dropdown-link>
-                            <x-dropdown-link :href="route('admin.recordPet')">
-                                {{ __('Pets Records') }}
+                            <x-dropdown-link :href="route('admin.archivedVehicles')">
+                                {{ __('Archived Vehicles') }}
                             </x-dropdown-link>
                         </x-slot>
                     </x-dropdown>

@@ -30,7 +30,7 @@ class ResidentController extends Controller
 
         Excel::import(new ResidentImport, $request->file('import_file'));
 
-        return redirect()->back()->with('status', 'Imported Successfully');
+        return redirect()->back();
     }
 
 //<----Pets
@@ -51,8 +51,9 @@ class ResidentController extends Controller
 
         Excel::import(new PetImport, $request->file('import_file'));
 
-        return redirect()->back()->with('status', 'Imported Successfully');
+        return redirect()->back();
     }
+    
 //<----Vehicles
     public function getVehicle()
     {   
@@ -71,7 +72,7 @@ class ResidentController extends Controller
 
         Excel::import(new VehicleImport, $request->file('import_file'));
 
-        return redirect()->back()->with('status', 'Imported Successfully');
+        return redirect()->back();
     }
 
     public function createTenant($residentId)
@@ -109,7 +110,6 @@ class ResidentController extends Controller
                 'violation' => 'required',
             ]);
 
-            // Set additional data
             $data['homeowner_id'] = $homeownerId;
             $data['block'] = $block;
             $data['lot'] = $lot;
@@ -123,7 +123,5 @@ class ResidentController extends Controller
             // Handle the case when the resident is not found
             return redirect()->back()->with('error', 'Resident not found.');
         }
-
-
     }
 }
